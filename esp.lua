@@ -1,4 +1,4 @@
--- === ระบบ ESP Core (รันแยกเดี่ยวๆ ได้เลย) ===
+-- === ระบบ ESP & World Core (แยกออกมาจาก UI หลัก) ===
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
@@ -14,8 +14,8 @@ local OriginalLighting = {
     ClockTime = Lighting.ClockTime
 }
 
--- ตารางตั้งค่า (สามารถปรับค่าจากสคริปต์ภายนอกได้ผ่าน getgenv() ถ้าต้องการ)
-getgenv().ESPSettings = {
+-- ตารางตั้งค่ากลาง (สามารถสั่งปรับเปลี่ยนค่านี้จากสคริปต์ภายนอกหรือ UI ของคุณได้ทันที)
+getgenv().ESPSettings = getgenv().ESPSettings or {
     Enabled = false,
     MaxDistance = 1000,
     TextSize = 14,
@@ -371,6 +371,10 @@ local function addPlayer(player)
         else
             for _, line in pairs(pData.SkeletonLines) do line.Visible = false end
         end
+    end)
+    
+    player.AncestryChanged:Connect(function(_, parent)
+        if not parent then removeESP(player) end
     end)
 end
 
