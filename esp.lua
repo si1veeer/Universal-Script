@@ -1,21 +1,5 @@
--- === ระบบ ESP & World Core (แยกออกมาจาก UI หลัก) ===
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Lighting = game:GetService("Lighting")
-local Camera = workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
-
-local OriginalLighting = {
-    Brightness = Lighting.Brightness,
-    GlobalShadows = Lighting.GlobalShadows,
-    OutdoorAmbient = Lighting.OutdoorAmbient,
-    FogEnd = Lighting.FogEnd,
-    Ambient = Lighting.Ambient,
-    ClockTime = Lighting.ClockTime
-}
-
--- ตารางตั้งค่ากลาง (สามารถสั่งปรับเปลี่ยนค่านี้จากสคริปต์ภายนอกหรือ UI ของคุณได้ทันที)
-getgenv().ESPSettings = getgenv().ESPSettings or {
+local Settings = {
+    -- ESP & World Settings
     Enabled = false,
     MaxDistance = 1000,
     TextSize = 14,
@@ -64,7 +48,6 @@ getgenv().ESPSettings = getgenv().ESPSettings or {
     Thickness = 1.5
 }
 
-local Settings = getgenv().ESPSettings
 local ESPData = {}
 local ChamsData = {}
 
@@ -92,7 +75,9 @@ local function removeESP(player)
         if ESPData[player].BoxOutline then ESPData[player].BoxOutline:Remove() end
         
         if ESPData[player].CornerLines then
-            for _, line in pairs(ESPData[player].CornerLines) do line:Remove() end
+            for _, line in pairs(ESPData[player].CornerLines) do
+                line:Remove()
+            end
         end
 
         if ESPData[player].HealthBar then ESPData[player].HealthBar:Remove() end
@@ -106,7 +91,9 @@ local function removeESP(player)
         if ESPData[player].ArrowText then ESPData[player].ArrowText:Remove() end
         
         if ESPData[player].SkeletonLines then
-            for _, line in pairs(ESPData[player].SkeletonLines) do line:Remove() end
+            for _, line in pairs(ESPData[player].SkeletonLines) do
+                line:Remove()
+            end
         end
         ESPData[player] = nil
     end
@@ -117,15 +104,28 @@ local function addPlayer(player)
     if player == LocalPlayer then return end
     
     local skeletonJoints = {
-        {"Head", "UpperTorso"}, {"UpperTorso", "LowerTorso"},
-        {"UpperTorso", "LeftUpperArm"}, {"LeftUpperArm", "LeftLowerArm"}, {"LeftLowerArm", "LeftHand"},
-        {"UpperTorso", "RightUpperArm"}, {"RightUpperArm", "RightLowerArm"}, {"RightLowerArm", "RightHand"},
-        {"LowerTorso", "LeftUpperLeg"}, {"LeftUpperLeg", "LeftLowerLeg"}, {"LeftLowerLeg", "LeftFoot"},
-        {"LowerTorso", "RightUpperLeg"}, {"RightUpperLeg", "RightLowerLeg"}, {"RightLowerLeg", "RightFoot"}
+        {"Head", "UpperTorso"},
+        {"UpperTorso", "LowerTorso"},
+        {"UpperTorso", "LeftUpperArm"},
+        {"LeftUpperArm", "LeftLowerArm"},
+        {"LeftLowerArm", "LeftHand"},
+        {"UpperTorso", "RightUpperArm"},
+        {"RightUpperArm", "RightLowerArm"},
+        {"RightLowerArm", "RightHand"},
+        {"LowerTorso", "LeftUpperLeg"},
+        {"LeftUpperLeg", "LeftLowerLeg"},
+        {"LeftLowerLeg", "LeftFoot"},
+        {"LowerTorso", "RightUpperLeg"},
+        {"RightUpperLeg", "RightLowerLeg"},
+        {"RightLowerLeg", "RightFoot"}
     }
+
     local skeletonJointsR6 = {
-        {"Head", "Torso"}, {"Torso", "Left Arm"}, {"Torso", "Right Arm"},
-        {"Torso", "Left Leg"}, {"Torso", "Right Leg"}
+        {"Head", "Torso"},
+        {"Torso", "Left Arm"},
+        {"Torso", "Right Arm"},
+        {"Torso", "Left Leg"},
+        {"Torso", "Right Leg"}
     }
 
     local pData = {
@@ -146,8 +146,13 @@ local function addPlayer(player)
         CachedVisResult = true
     }
 
-    for i = 1, 16 do pData.CornerLines[i] = createDrawing("Line", {Color = Settings.BoxColor, Thickness = 1.5, Visible = false}) end
-    for i = 1, 14 do pData.SkeletonLines[i] = createDrawing("Line", {Color = Settings.SkeletonColor, Thickness = 1, Visible = false, Transparency = 0.8}) end
+    for i = 1, 16 do
+        pData.CornerLines[i] = createDrawing("Line", {Color = Settings.BoxColor, Thickness = 1.5, Visible = false})
+    end
+
+    for i = 1, 14 do
+        pData.SkeletonLines[i] = createDrawing("Line", {Color = Settings.SkeletonColor, Thickness = 1, Visible = false, Transparency = 0.8})
+    end
 
     ESPData[player] = pData
 
@@ -162,13 +167,21 @@ local function addPlayer(player)
     ChamsData[player] = {Highlight = highlight}
 
     local function hideAll()
-        pData.Box.Visible = false pData.BoxOutline.Visible = false
+        pData.Box.Visible = false
+        pData.BoxOutline.Visible = false
         for _, line in pairs(pData.CornerLines) do line.Visible = false end
-        pData.HealthBar.Visible = false pData.HealthBarOutline.Visible = false
-        pData.HealthTag.Visible = false pData.WeaponTag.Visible = false
-        pData.NameTag.Visible = false pData.DistanceTag.Visible = false
-        pData.Tracer.Visible = false pData.Arrow.Visible = false pData.ArrowText.Visible = false
-        for _, line in pairs(pData.SkeletonLines) do line.Visible = false end
+        pData.HealthBar.Visible = false
+        pData.HealthBarOutline.Visible = false
+        pData.HealthTag.Visible = false
+        pData.WeaponTag.Visible = false
+        pData.NameTag.Visible = false
+        pData.DistanceTag.Visible = false
+        pData.Tracer.Visible = false
+        pData.Arrow.Visible = false
+        pData.ArrowText.Visible = false
+        for _, line in pairs(pData.SkeletonLines) do
+            line.Visible = false
+        end
         highlight.Enabled = false
     end
 
@@ -179,14 +192,20 @@ local function addPlayer(player)
         local head = character and character:FindFirstChild("Head")
 
         if not Settings.Enabled or not rootPart or not humanoid or not head or humanoid.Health <= 0 then
-            hideAll() return
+            hideAll()
+            return
         end
+
         if Settings.TeamCheck and player.Team == LocalPlayer.Team and LocalPlayer.Team ~= nil then
-            hideAll() return
+            hideAll()
+            return
         end
 
         local distance = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and (LocalPlayer.Character.HumanoidRootPart.Position - rootPart.Position).Magnitude or 0
-        if distance > Settings.MaxDistance then hideAll() return end
+        if distance > Settings.MaxDistance then
+            hideAll()
+            return
+        end
 
         local currentTime = tick()
         if currentTime - pData.LastVisCheck > 0.2 then
@@ -197,34 +216,63 @@ local function addPlayer(player)
                 local targetPos = head.Position
                 local raycastParams = RaycastParams.new()
                 raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+                
                 local filterTable = {LocalPlayer.Character, character}
                 if Camera then table.insert(filterTable, Camera) end
                 raycastParams.FilterDescendantsInstances = filterTable
-                if workspace:Raycast(origin, targetPos - origin, raycastParams) then isVisible = false end
+                
+                local result = workspace:Raycast(origin, targetPos - origin, raycastParams)
+                if result then
+                    isVisible = false
+                end
             end
             pData.CachedVisResult = isVisible
         end
 
-        if Settings.VisCheck and not pData.CachedVisResult then hideAll() return end
+        if Settings.VisCheck and not pData.CachedVisResult then
+            hideAll()
+            return
+        end
 
         if Settings.Chams then
             highlight.Adornee = character
-            highlight.FillColor = Settings.ChamsVisibleCheck and (pData.CachedVisResult and Settings.ChamsVisibleColor or Settings.ChamsHiddenColor) or Settings.ChamsFillColor
+            if Settings.ChamsVisibleCheck then
+                if pData.CachedVisResult then
+                    highlight.FillColor = Settings.ChamsVisibleColor
+                else
+                    highlight.FillColor = Settings.ChamsHiddenColor
+                end
+            else
+                highlight.FillColor = Settings.ChamsFillColor
+            end
             highlight.OutlineColor = Settings.ChamsOutlineColor
             highlight.FillTransparency = Settings.ChamsFillTransparency / 100
             highlight.OutlineTransparency = Settings.ChamsOutlineTransparency / 100
+            
             for _, desc in ipairs(character:GetDescendants()) do
-                if desc:IsA("BasePart") then pcall(function() desc.Material = Enum.Material[Settings.ChamsMaterial] or Enum.Material.SmoothPlastic end) end
+                if desc:IsA("BasePart") then
+                    pcall(function()
+                        desc.Material = Enum.Material[Settings.ChamsMaterial] or Enum.Material.SmoothPlastic
+                    end)
+                end
             end
+
             highlight.Enabled = true
         else
             highlight.Enabled = false
-            for _, desc in ipairs(character:GetDescendants()) do
-                if desc:IsA("BasePart") then pcall(function() desc.Material = Enum.Material.SmoothPlastic end) end
+            if character then
+                for _, desc in ipairs(character:GetDescendants()) do
+                    if desc:IsA("BasePart") then
+                        pcall(function()
+                            desc.Material = Enum.Material.SmoothPlastic
+                        end)
+                    end
+                end
             end
         end
 
         local rootPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+
         if not onScreen then
             hideAll()
             if Settings.OffScreenArrows then
@@ -233,17 +281,25 @@ local function addPlayer(player)
                 local relPos = rootPart.Position - camPos
                 local relFlat = Vector3.new(relPos.X, 0, relPos.Z).Unit
                 local lookFlat = Vector3.new(camLook.X, 0, camLook.Z).Unit
+                
                 local dot = lookFlat:Dot(relFlat)
                 local cross = lookFlat:Cross(relFlat).Y
                 local angle = math.acos(math.clamp(dot, -1, 1))
                 if cross < 0 then angle = -angle end
+
                 local viewCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-                local arrowPos = viewCenter + Vector2.new(math.cos(angle - math.pi/2), math.sin(angle - math.pi/2)) * Settings.ArrowRadius
+                local radius = Settings.ArrowRadius
+                local arrowPos = viewCenter + Vector2.new(math.cos(angle - math.pi/2), math.sin(angle - math.pi/2)) * radius
+
                 local size = Settings.ArrowSize
                 local dir = (viewCenter - arrowPos).Unit
-                pData.Arrow.PointA = arrowPos
-                pData.Arrow.PointB = arrowPos + Vector2.new(-dir.Y, dir.X) * (size / 2) - dir * size
-                pData.Arrow.PointC = arrowPos + Vector2.new(dir.Y, -dir.X) * (size / 2) - dir * size
+                local p1 = arrowPos
+                local p2 = arrowPos + Vector2.new(-dir.Y, dir.X) * (size / 2) - dir * size
+                local p3 = arrowPos + Vector2.new(dir.Y, -dir.X) * (size / 2) - dir * size
+
+                pData.Arrow.PointA = p1
+                pData.Arrow.PointB = p2
+                pData.Arrow.PointC = p3
                 pData.Arrow.Color = Settings.ArrowColor
                 pData.Arrow.Visible = true
 
@@ -258,90 +314,147 @@ local function addPlayer(player)
             end
             return
         else
-            pData.Arrow.Visible = false pData.ArrowText.Visible = false
+            pData.Arrow.Visible = false
+            pData.ArrowText.Visible = false
         end
 
-        local topPos = Camera:WorldToViewportPoint(head.Position + Vector3.new(0, 0.8, 0))
-        local bottomPos = Camera:WorldToViewportPoint(rootPart.Position - Vector3.new(0, 3, 0))
+        local topWorld = head.Position + Vector3.new(0, 0.8, 0)
+        local bottomWorld = rootPart.Position - Vector3.new(0, 3, 0)
+
+        local topPos = Camera:WorldToViewportPoint(topWorld)
+        local bottomPos = Camera:WorldToViewportPoint(bottomWorld)
+
         local boxHeight = math.abs(topPos.Y - bottomPos.Y)
         local boxWidth = boxHeight / 2.0 
+        
         local boxX = rootPos.X - (boxWidth / 2)
         local boxY = topPos.Y
 
         if Settings.Box then
             if Settings.BoxType == "Box" then
                 for _, line in pairs(pData.CornerLines) do line.Visible = false end
-                pData.BoxOutline.Size = Vector2.new(boxWidth, boxHeight) pData.BoxOutline.Position = Vector2.new(boxX, boxY) pData.BoxOutline.Visible = true
-                pData.Box.Size = Vector2.new(boxWidth, boxHeight) pData.Box.Position = Vector2.new(boxX, boxY) pData.Box.Color = Settings.BoxColor pData.Box.Visible = true
+
+                pData.BoxOutline.Size = Vector2.new(boxWidth, boxHeight)
+                pData.BoxOutline.Position = Vector2.new(boxX, boxY)
+                pData.BoxOutline.Visible = true
+
+                pData.Box.Size = Vector2.new(boxWidth, boxHeight)
+                pData.Box.Position = Vector2.new(boxX, boxY)
+                pData.Box.Color = Settings.BoxColor
+                pData.Box.Visible = true
             elseif Settings.BoxType == "Corner" then
-                pData.Box.Visible = false pData.BoxOutline.Visible = false
-                local lX, lY = boxWidth / 4, boxHeight / 4
+                pData.Box.Visible = false
+                pData.BoxOutline.Visible = false
+
+                local lengthX = boxWidth / 4
+                local lengthY = boxHeight / 4
                 local lines = pData.CornerLines
-                local oC, bC = Color3.fromRGB(0, 0, 0), Settings.BoxColor
-                lines[1].From = Vector2.new(boxX, boxY) lines[1].To = Vector2.new(boxX + lX, boxY) lines[1].Color = oC lines[1].Thickness = 2.5
-                lines[2].From = Vector2.new(boxX, boxY) lines[2].To = Vector2.new(boxX + lX, boxY) lines[2].Color = bC lines[2].Thickness = 1.25
-                lines[3].From = Vector2.new(boxX, boxY) lines[3].To = Vector2.new(boxX, boxY + lY) lines[3].Color = oC lines[3].Thickness = 2.5
-                lines[4].From = Vector2.new(boxX, boxY) lines[4].To = Vector2.new(boxX, boxY + lY) lines[4].Color = bC lines[4].Thickness = 1.25
-                lines[5].From = Vector2.new(boxX + boxWidth, boxY) lines[5].To = Vector2.new(boxX + boxWidth - lX, boxY) lines[5].Color = oC lines[5].Thickness = 2.5
-                lines[6].From = Vector2.new(boxX + boxWidth, boxY) lines[6].To = Vector2.new(boxX + boxWidth - lX, boxY) lines[6].Color = bC lines[6].Thickness = 1.25
-                lines[7].From = Vector2.new(boxX + boxWidth, boxY) lines[7].To = Vector2.new(boxX + boxWidth, boxY + lY) lines[7].Color = oC lines[7].Thickness = 2.5
-                lines[8].From = Vector2.new(boxX + boxWidth, boxY) lines[8].To = Vector2.new(boxX + boxWidth, boxY + lY) lines[8].Color = bC lines[8].Thickness = 1.25
-                lines[9].From = Vector2.new(boxX, boxY + boxHeight) lines[9].To = Vector2.new(boxX + lX, boxY + boxHeight) lines[9].Color = oC lines[9].Thickness = 2.5
-                lines[10].From = Vector2.new(boxX, boxY + boxHeight) lines[10].To = Vector2.new(boxX + lX, boxY + boxHeight) lines[10].Color = bC lines[10].Thickness = 1.25
-                lines[11].From = Vector2.new(boxX, boxY + boxHeight) lines[11].To = Vector2.new(boxX, boxY + boxHeight - lY) lines[11].Color = oC lines[11].Thickness = 2.5
-                lines[12].From = Vector2.new(boxX, boxY + boxHeight) lines[12].To = Vector2.new(boxX, boxY + boxHeight - lY) lines[12].Color = bC lines[12].Thickness = 1.25
-                lines[13].From = Vector2.new(boxX + boxWidth, boxY + boxHeight) lines[13].To = Vector2.new(boxX + boxWidth - lX, boxY + boxHeight) lines[13].Color = oC lines[13].Thickness = 2.5
-                lines[14].From = Vector2.new(boxX + boxWidth, boxY + boxHeight) lines[14].To = Vector2.new(boxX + boxWidth - lX, boxY + boxHeight) lines[14].Color = bC lines[14].Thickness = 1.25
-                lines[15].From = Vector2.new(boxX + boxWidth, boxY + boxHeight) lines[15].To = Vector2.new(boxX + boxWidth, boxY + boxHeight - lY) lines[15].Color = oC lines[15].Thickness = 2.5
-                lines[16].From = Vector2.new(boxX + boxWidth, boxY + boxHeight) lines[16].To = Vector2.new(boxX + boxWidth, boxY + boxHeight - lY) lines[16].Color = bC lines[16].Thickness = 1.25
-                for i = 1, 16 do lines[i].Visible = true end
+
+                local outlineColor = Color3.fromRGB(0, 0, 0)
+                local boxColor = Settings.BoxColor
+
+                lines[1].From = Vector2.new(boxX, boxY) lines[1].To = Vector2.new(boxX + lengthX, boxY) lines[1].Color = outlineColor lines[1].Thickness = 2.5
+                lines[2].From = Vector2.new(boxX, boxY) lines[2].To = Vector2.new(boxX + lengthX, boxY) lines[2].Color = boxColor lines[2].Thickness = 1.25
+                
+                lines[3].From = Vector2.new(boxX, boxY) lines[3].To = Vector2.new(boxX, boxY + lengthY) lines[3].Color = outlineColor lines[3].Thickness = 2.5
+                lines[4].From = Vector2.new(boxX, boxY) lines[4].To = Vector2.new(boxX, boxY + lengthY) lines[4].Color = boxColor lines[4].Thickness = 1.25
+
+                lines[5].From = Vector2.new(boxX + boxWidth, boxY) lines[5].To = Vector2.new(boxX + boxWidth - lengthX, boxY) lines[5].Color = outlineColor lines[5].Thickness = 2.5
+                lines[6].From = Vector2.new(boxX + boxWidth, boxY) lines[6].To = Vector2.new(boxX + boxWidth - lengthX, boxY) lines[6].Color = boxColor lines[6].Thickness = 1.25
+                
+                lines[7].From = Vector2.new(boxX + boxWidth, boxY) lines[7].To = Vector2.new(boxX + boxWidth, boxY + lengthY) lines[7].Color = outlineColor lines[7].Thickness = 2.5
+                lines[8].From = Vector2.new(boxX + boxWidth, boxY) lines[8].To = Vector2.new(boxX + boxWidth, boxY + lengthY) lines[8].Color = boxColor lines[8].Thickness = 1.25
+
+                lines[9].From = Vector2.new(boxX, boxY + boxHeight) lines[9].To = Vector2.new(boxX + lengthX, boxY + boxHeight) lines[9].Color = outlineColor lines[9].Thickness = 2.5
+                lines[10].From = Vector2.new(boxX, boxY + boxHeight) lines[10].To = Vector2.new(boxX + lengthX, boxY + boxHeight) lines[10].Color = boxColor lines[10].Thickness = 1.25
+                
+                lines[11].From = Vector2.new(boxX, boxY + boxHeight) lines[11].To = Vector2.new(boxX, boxY + boxHeight - lengthY) lines[11].Color = outlineColor lines[11].Thickness = 2.5
+                lines[12].From = Vector2.new(boxX, boxY + boxHeight) lines[12].To = Vector2.new(boxX, boxY + boxHeight - lengthY) lines[12].Color = boxColor lines[12].Thickness = 1.25
+
+                lines[13].From = Vector2.new(boxX + boxWidth, boxY + boxHeight) lines[13].To = Vector2.new(boxX + boxWidth - lengthX, boxY + boxHeight) lines[13].Color = outlineColor lines[13].Thickness = 2.5
+                lines[14].From = Vector2.new(boxX + boxWidth, boxY + boxHeight) lines[14].To = Vector2.new(boxX + boxWidth - lengthX, boxY + boxHeight) lines[14].Color = boxColor lines[14].Thickness = 1.25
+                
+                lines[15].From = Vector2.new(boxX + boxWidth, boxY + boxHeight) lines[15].To = Vector2.new(boxX + boxWidth, boxY + boxHeight - lengthY) lines[15].Color = outlineColor lines[15].Thickness = 2.5
+                lines[16].From = Vector2.new(boxX + boxWidth, boxY + boxHeight) lines[16].To = Vector2.new(boxX + boxWidth, boxY + boxHeight - lengthY) lines[16].Color = boxColor lines[16].Thickness = 1.25
+
+                for i = 1, 16 do
+                    lines[i].Visible = true
+                end
+            else
+                pData.Box.Visible = false
+                pData.BoxOutline.Visible = false
+                for _, line in pairs(pData.CornerLines) do line.Visible = false end
             end
         else
-            pData.Box.Visible = false pData.BoxOutline.Visible = false
+            pData.Box.Visible = false
+            pData.BoxOutline.Visible = false
             for _, line in pairs(pData.CornerLines) do line.Visible = false end
         end
 
         if Settings.HealthBar then
-            local hp = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
-            local barH = boxHeight * hp
+            local healthPercent = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
+            local barHeight = boxHeight * healthPercent
             local barX = (Settings.HealthBarSide == "Left") and (boxX - 5) or (boxX + boxWidth + 2)
-            pData.HealthBarOutline.Size = Vector2.new(3, boxHeight) pData.HealthBarOutline.Position = Vector2.new(barX, boxY) pData.HealthBarOutline.Visible = true
-            pData.HealthBar.Size = Vector2.new(1, barH) pData.HealthBar.Position = Vector2.new(barX + 1, boxY + boxHeight - barH)
-            pData.HealthBar.Color = Settings.DynamicHealthColor and Color3.fromHSV(hp * 0.3, 1, 1) or Settings.HealthBarColor
+            
+            pData.HealthBarOutline.Size = Vector2.new(3, boxHeight)
+            pData.HealthBarOutline.Position = Vector2.new(barX, boxY)
+            pData.HealthBarOutline.Visible = true
+
+            pData.HealthBar.Size = Vector2.new(1, barHeight)
+            pData.HealthBar.Position = Vector2.new(barX + 1, boxY + boxHeight - barHeight)
+            
+            if Settings.DynamicHealthColor then
+                pData.HealthBar.Color = Color3.fromHSV(healthPercent * 0.3, 1, 1)
+            else
+                pData.HealthBar.Color = Settings.HealthBarColor
+            end
             pData.HealthBar.Visible = true
 
             if Settings.HealthText then
                 pData.HealthTag.Text = math.floor(humanoid.Health)
-                pData.HealthTag.Position = Vector2.new(barX + (Settings.HealthBarSide == "Left" and -20 or 6), boxY + boxHeight - barH - 5)
+                pData.HealthTag.Size = 12
+                if Settings.HealthBarSide == "Left" then
+                    pData.HealthTag.Position = Vector2.new(barX - 20, boxY + boxHeight - barHeight - 5)
+                else
+                    pData.HealthTag.Position = Vector2.new(barX + 6, boxY + boxHeight - barHeight - 5)
+                end
                 pData.HealthTag.Visible = true
             else
                 pData.HealthTag.Visible = false
             end
         else
-            pData.HealthBar.Visible = false pData.HealthBarOutline.Visible = false pData.HealthTag.Visible = false
+            pData.HealthBar.Visible = false
+            pData.HealthBarOutline.Visible = false
+            pData.HealthTag.Visible = false
         end
 
         if Settings.Name then
-            pData.NameTag.Text = player.Name pData.NameTag.Size = Settings.TextSize
+            pData.NameTag.Text = player.Name
+            pData.NameTag.Size = Settings.TextSize
             pData.NameTag.Position = Vector2.new(boxX + (boxWidth / 2), boxY - Settings.TextSize - 4)
-            pData.NameTag.Color = Settings.NameColor pData.NameTag.Visible = true
+            pData.NameTag.Color = Settings.NameColor
+            pData.NameTag.Visible = true
         else
             pData.NameTag.Visible = false
         end
 
         if Settings.Distance and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            pData.DistanceTag.Text = "[" .. math.floor(distance) .. "m]" pData.DistanceTag.Size = Settings.TextSize
+            pData.DistanceTag.Text = "[" .. math.floor(distance) .. "m]"
+            pData.DistanceTag.Size = Settings.TextSize
             pData.DistanceTag.Position = Vector2.new(boxX + (boxWidth / 2), boxY + boxHeight + 2)
-            pData.DistanceTag.Color = Settings.DistanceColor pData.DistanceTag.Visible = true
+            pData.DistanceTag.Color = Settings.DistanceColor
+            pData.DistanceTag.Visible = true
         else
             pData.DistanceTag.Visible = false
         end
 
         if Settings.Weapon then
             local tool = character:FindFirstChildOfClass("Tool")
-            pData.WeaponTag.Text = tool and tool.Name or "None" pData.WeaponTag.Size = Settings.TextSize
+            pData.WeaponTag.Text = tool and tool.Name or "None"
+            pData.WeaponTag.Size = Settings.TextSize
             pData.WeaponTag.Position = Vector2.new(boxX + (boxWidth / 2), boxY + boxHeight + (Settings.Distance and 18 or 2))
-            pData.WeaponTag.Color = Settings.WeaponColor pData.WeaponTag.Visible = true
+            pData.WeaponTag.Color = Settings.WeaponColor
+            pData.WeaponTag.Visible = true
         else
             pData.WeaponTag.Visible = false
         end
@@ -349,7 +462,8 @@ local function addPlayer(player)
         if Settings.Tracers then
             pData.Tracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
             pData.Tracer.To = Vector2.new(rootPos.X, rootPos.Y)
-            pData.Tracer.Color = Settings.TracerColor pData.Tracer.Visible = true
+            pData.Tracer.Color = Settings.TracerColor
+            pData.Tracer.Visible = true
         else
             pData.Tracer.Visible = false
         end
@@ -357,43 +471,78 @@ local function addPlayer(player)
         if Settings.Skeleton then
             local joints = humanoid.RigType == Enum.HumanoidRigType.R15 and skeletonJoints or skeletonJointsR6
             for i, joint in ipairs(joints) do
-                local pA, pB = character:FindFirstChild(joint[1]), character:FindFirstChild(joint[2])
+                local partA = character:FindFirstChild(joint[1])
+                local partB = character:FindFirstChild(joint[2])
                 local line = pData.SkeletonLines[i]
-                if pA and pB and line then
-                    local posA, oA = Camera:WorldToViewportPoint(pA.Position)
-                    local posB, oB = Camera:WorldToViewportPoint(pB.Position)
-                    if oA or oB then
-                        line.From = Vector2.new(posA.X, posA.Y) line.To = Vector2.new(posB.X, posB.Y)
-                        line.Color = Settings.SkeletonColor line.Visible = true
-                    else line.Visible = false end
-                elseif line then line.Visible = false end
+
+                if partA and partB and line then
+                    local posA, onScreenA = Camera:WorldToViewportPoint(partA.Position)
+                    local posB, onScreenB = Camera:WorldToViewportPoint(partB.Position)
+
+                    if onScreenA or onScreenB then
+                        line.From = Vector2.new(posA.X, posA.Y)
+                        line.To = Vector2.new(posB.X, posB.Y)
+                        line.Color = Settings.SkeletonColor
+                        line.Visible = true
+                    else
+                        line.Visible = false
+                    end
+                else
+                    if line then line.Visible = false end
+                end
             end
         else
-            for _, line in pairs(pData.SkeletonLines) do line.Visible = false end
+            for _, line in pairs(pData.SkeletonLines) do
+                line.Visible = false
+            end
         end
     end)
-    
+
     player.AncestryChanged:Connect(function(_, parent)
-        if not parent then removeESP(player) end
+        if not parent then
+            removeESP(player)
+        end
     end)
 end
 
-for _, player in ipairs(Players:GetPlayers()) do addPlayer(player) end
+for _, player in ipairs(Players:GetPlayers()) do 
+    addPlayer(player) 
+end
+
 Players.PlayerAdded:Connect(addPlayer)
 Players.PlayerRemoving:Connect(removeESP)
 
 RunService.RenderStepped:Connect(function()
     if Settings.Fullbright then
-        Lighting.Brightness = 2 Lighting.GlobalShadows = false Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+        Lighting.Brightness = 2
+        Lighting.GlobalShadows = false
+        Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
     else
-        Lighting.Brightness = OriginalLighting.Brightness Lighting.GlobalShadows = OriginalLighting.GlobalShadows Lighting.OutdoorAmbient = OriginalLighting.OutdoorAmbient
+        Lighting.Brightness = OriginalLighting.Brightness
+        Lighting.GlobalShadows = OriginalLighting.GlobalShadows
+        Lighting.OutdoorAmbient = OriginalLighting.OutdoorAmbient
     end
+
     if Settings.RemoveFog then
         Lighting.FogEnd = 999999
-        for _, v in ipairs(Lighting:GetChildren()) do if v:IsA("Atmosphere") then v.Density = 0 end end
+        for _, v in ipairs(Lighting:GetChildren()) do
+            if v:IsA("Atmosphere") then
+                v.Density = 0
+            end
+        end
     else
         Lighting.FogEnd = OriginalLighting.FogEnd
     end
-    Lighting.ClockTime = Settings.CustomTime and Settings.TimeOfDay or OriginalLighting.ClockTime
-    Lighting.Ambient = Settings.AmbientColorEnabled and Settings.AmbientColor or OriginalLighting.Ambient
+
+    if Settings.CustomTime then
+        Lighting.ClockTime = Settings.TimeOfDay
+    else
+        Lighting.ClockTime = OriginalLighting.ClockTime
+    end
+
+    if Settings.AmbientColorEnabled then
+        Lighting.Ambient = Settings.AmbientColor
+    else
+        Lighting.Ambient = OriginalLighting.Ambient
+    end
 end)
