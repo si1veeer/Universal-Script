@@ -1,7 +1,8 @@
 return function(Library, Window, Settings)
-    local VisualsTab = Window:Page({Name = "Visuals", Columns = 2 })
-    local VisualsEsp = VisualsTab:Section({Name = "Esp", Side = 1 })
-    local VisualsMisc = VisualsTab:Section({Name = "Misc", Side = 2 })
+    -- สร้าง Tab และ Section สำหรับเมนู
+    local VisualsTab = Window:Tab({ Name = "Visuals" })
+    local VisualsEsp = VisualsTab:Section({ Name = "Esp", Side = "Left" })
+    local VisualsMisc = VisualsTab:Section({ Name = "Misc", Side = "Right" })
 
     VisualsEsp:Toggle({
         Name = "Enabled", Default = false, Flag = "ESP_Enabled",
