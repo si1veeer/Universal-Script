@@ -1,3 +1,4 @@
+-- === ระบบ ESP Core (รันแยกเดี่ยวๆ ได้เลย) ===
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
@@ -13,8 +14,8 @@ local OriginalLighting = {
     ClockTime = Lighting.ClockTime
 }
 
--- === การตั้งค่าเฉพาะ ESP & Visuals ===
-local Settings = {
+-- ตารางตั้งค่า (สามารถปรับค่าจากสคริปต์ภายนอกได้ผ่าน getgenv() ถ้าต้องการ)
+getgenv().ESPSettings = {
     Enabled = false,
     MaxDistance = 1000,
     TextSize = 14,
@@ -63,6 +64,7 @@ local Settings = {
     Thickness = 1.5
 }
 
+local Settings = getgenv().ESPSettings
 local ESPData = {}
 local ChamsData = {}
 
@@ -391,5 +393,3 @@ RunService.RenderStepped:Connect(function()
     Lighting.ClockTime = Settings.CustomTime and Settings.TimeOfDay or OriginalLighting.ClockTime
     Lighting.Ambient = Settings.AmbientColorEnabled and Settings.AmbientColor or OriginalLighting.Ambient
 end)
-
-return Settings
